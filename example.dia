@@ -1,0 +1,3 @@
+hello(str: string): string = "Hello " + str
+
+main = hello("Ch1keen").puts

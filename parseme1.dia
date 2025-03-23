@@ -1,0 +1,4 @@
+hello(str: string): string = "Hello " + str
+add(i: int): int = 35.plus(i)
+
+main = "Ch1keen".hello.puts
