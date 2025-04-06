@@ -1,28 +1,35 @@
-OCAMLC=ocamlc
+OCAMLCOMP=ocamlopt
 OCAMLLEX=ocamllex
 OCAMLYACC=ocamlyacc
 
-all: lexer
-	$(OCAMLC) -c main.ml
+all: ocamlopt
+
+ocamlrun: OCAMLCOMP=ocamlc
+ocamlrun: lexer
+	$(OCAMLCOMP) -c main.ml
 	# The order is important
-	$(OCAMLC) diaNode.cmo predefined.cmo lexer.cmo dia.cmo parser.cmo main.cmo -o diac -g
+	$(OCAMLCOMP) diaNode.cmo predefined.cmo lexer.cmo dia.cmo parser.cmo main.cmo -o diac -g
+
+ocamlopt: lexer
+	$(OCAMLCOMP) -c main.ml
+	${OCAMLCOMP} diaNode.cmx predefined.cmx lexer.cmx dia.cmx parser.cmx main.cmx -o diac -g
 
 type_predefined:
-	$(OCAMLC) -c diaNode.ml
-	$(OCAMLC) -c predefined.ml
-	$(OCAMLC) -c dia.mli
-	$(OCAMLC) -c dia.ml
+	$(OCAMLCOMP) -c diaNode.ml
+	$(OCAMLCOMP) -c predefined.ml
+	$(OCAMLCOMP) -c dia.mli
+	$(OCAMLCOMP) -c dia.ml
 
 parser: type_predefined
 	$(OCAMLYACC) parser.mly
-	$(OCAMLC) -c parser.mli
-	$(OCAMLC) -c parser.ml
+	$(OCAMLCOMP) -c parser.mli
+	$(OCAMLCOMP) -c parser.ml
 
 lexer: parser
 	$(OCAMLLEX) lexer.mll
-	$(OCAMLC) -c lexer.ml
+	$(OCAMLCOMP) -c lexer.ml
 
 clean:
-	rm *.cmo *.cmi parser.mli
+	rm *.o *.cmo *.cmx *.cmi parser.mli
 	rm lexer.ml parser.ml
 	rm diac
