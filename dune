@@ -1,0 +1,9 @@
+(ocamllex lexer)
+(ocamlyacc parser)
+
+(executable
+  (name main))
+
+(env
+  (dev
+    (flags (:standard -w -27))))

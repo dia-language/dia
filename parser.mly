@@ -1,5 +1,4 @@
 %{
-  open Dia
   open DiaNode
 
   exception DiaSyntaxError of string

@@ -1,6 +1,5 @@
 open Dia
 open DiaNode
-open Lexer
 
 let dia_help = "\
   Dia: The brilliance of Diamond, the elegance of the Language\n\n\
