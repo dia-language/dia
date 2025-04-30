@@ -30,6 +30,6 @@ lexer: parser
 	$(OCAMLCOMP) -c lexer.ml
 
 clean:
-	rm *.o *.cmo *.cmx *.cmi parser.mli
-	rm lexer.ml parser.ml
-	rm diac
+	rm -f *.o *.cmo *.cmx *.cmi parser.mli
+	rm -f lexer.ml parser.ml
+	rm -f diac
