@@ -15,7 +15,40 @@ let dia_create_cpp_variable (i: int) =
 (* The Predefined.functions is defined at the end of the file. *)
 
 (*
- * Functions - IO Starts
+  Nearly all functions are defined like this:
+
+  {
+    node = {
+      name = "print";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = -1;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      dia_dbgprint "Generating 'print' function";
+      print_string "std::cout";
+      List.iter (fun n -> print_string("<<" ^ n.name)) node.parameters;
+      print_endline ";";
+      {
+        name = "_";
+        token_type = DiaConstant DiaVoid;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index
+  };
+
+  `node` was defined only for internal use; No token_type, no parameters,
+  no next_function are needed. To generate code of the function, what one needed
+  was just parameters.
+
+  Return type of predefined functions is also dia_function. It is used for mana-
+  ging `cpp_variable`s. The v1 in `auto v1 = 1+2;` for example.
+ *)
+
+(*
+ * Functions - IO Start
  *)
 let functions_io = [
   {
@@ -62,11 +95,11 @@ let functions_io = [
   };
 ]
 (*
- * Functions - IO Ends
+ * Functions - IO End
  *)
 
 (*
- * Functions - Arithmetic Starts
+ * Functions - Arithmetic Start
  *)
 let functions_arithmetic = [
   {
@@ -217,13 +250,96 @@ let functions_arithmetic = [
         next_function = None;
       }, var_index+1
   };
-
 ]
 (*
- * Functions - Arithmetic Ends
+ * Functions - Arithmetic End
  *)
 
+(*
+ * Functions - Logic Start
+ *)
+
+let functions_logic = [
+  {
+    node = {
+      name = "logical_and";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'logical_and' function";
+      Printf.printf "auto %s=%s&&%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "logical_or";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'logical_or' function";
+      Printf.printf "auto %s=%s||%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "logical_not";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 1;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0
+      in
+      dia_dbgprint "Generating 'logical_not' function";
+      Printf.printf "auto %s=!%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+]
+
+(*
+ * Functions - Logic Start
+ *)
 
 let functions =
   functions_io
   @ functions_arithmetic
+  @ functions_logic
