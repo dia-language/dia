@@ -94,6 +94,129 @@ let functions_arithmetic = [
         next_function = None;
       }, var_index+1
   };
+  {
+    node = {
+      name = "minus";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'minus' function";
+      Printf.printf "auto %s=%s-%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "multiplies";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'multiplies' function";
+      Printf.printf "auto %s=%s* %s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "divides";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'divides' function";
+      Printf.printf "auto %s=%s/%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "modulus";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'modulus' function";
+      Printf.printf "auto %s=%s%%%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "negate";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 1;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0
+      in
+      dia_dbgprint "Generating 'negate' function";
+      Printf.printf "auto %s=%s*(-1);\n"
+        (dia_create_cpp_variable var_index)
+        a1.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
 
 ]
 (*

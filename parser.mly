@@ -307,7 +307,7 @@ dia_arithmetic:
   }
 | dia_function DIA_MUL dia_function {
     {
-      name = "times";
+      name = "multiplies";
       token_type = DiaFunction DiaVoid;
       num_of_parameters = 2;
       parameters = [ $1; $3 ];
@@ -316,7 +316,7 @@ dia_arithmetic:
   }
 | dia_function DIA_DIV dia_function {
     {
-      name = "divide";
+      name = "divides";
       token_type = DiaFunction DiaVoid;
       num_of_parameters = 2;
       parameters = [ $1; $3 ];
@@ -376,7 +376,7 @@ dia_logical:
 dia_comparison:
 | dia_function DIA_EQUAL dia_function {
     {
-      name = "equal";
+      name = "equal_to";
       token_type = DiaFunction DiaVoid;
       num_of_parameters = 2;
       parameters = [ $1; $3 ];
@@ -385,7 +385,7 @@ dia_comparison:
   }
 | dia_function DIA_NOT_EQUAL dia_function {
     {
-      name = "not_equal";
+      name = "not_equal_to";
       token_type = DiaFunction DiaVoid;
       num_of_parameters = 2;
       parameters = [ $1; $3 ];
