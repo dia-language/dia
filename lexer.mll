@@ -11,7 +11,7 @@ let digit = ['0'-'9']
 rule parse_code = parse
 | ' ' { parse_code lexbuf }
 | '\n' { parse_code lexbuf }
-| '#' { parse_code lexbuf }
+| '#' [^'\n']+ { parse_code lexbuf }
 | "/*" { parse_code lexbuf }
 | "0x" ['0'-'9' 'a'-'f' 'A'-'F'] as hex {
     dia_dbgprint ("DIA_HEXADECIMAL: " ^ hex);
