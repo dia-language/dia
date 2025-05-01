@@ -336,10 +336,172 @@ let functions_logic = [
 ]
 
 (*
- * Functions - Logic Start
+ * Functions - Logic End
+ *)
+
+(*
+ * Functions - Comparison Start
+ *)
+
+ let functions_comparison = [
+  {
+    node = {
+      name = "equal_to";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'equal_to' function";
+      Printf.printf "auto %s=%s==%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "not_equal_to";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'not_equal_to' function";
+      Printf.printf "auto %s=%s!=%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "greater_equal";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'greater_equal' function";
+      Printf.printf "auto %s=%s>=%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "greater";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'greater' function";
+      Printf.printf "auto %s=%s>%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "less_equal";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'less_equal' function";
+      Printf.printf "auto %s=%s<=%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+  {
+    node = {
+      name = "less";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 2;
+      parameters = [];
+      next_function = None;
+    };
+    generate_code = fun node var_index ->
+      let a1 = List.nth node.parameters 0 in
+      let a2 = List.nth node.parameters 1
+      in
+      dia_dbgprint "Generating 'less' function";
+      Printf.printf "auto %s=%s<%s;\n"
+        (dia_create_cpp_variable var_index)
+        a1.name
+        a2.name;
+      {
+        name = (dia_create_cpp_variable var_index);
+        token_type = a1.token_type;
+        num_of_parameters = 0;
+        parameters = [];
+        next_function = None;
+      }, var_index+1
+  };
+]
+
+(*
+ * Functions - Comparison End
  *)
 
 let functions =
   functions_io
   @ functions_arithmetic
   @ functions_logic
+  @ functions_comparison
