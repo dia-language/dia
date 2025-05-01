@@ -116,7 +116,6 @@
 
 %left DIA_PLUS DIA_MINUS
 %left DIA_MUL DIA_DIV DIA_MOD
-%left DIA_BIND DIA_NEXT
 
 %start dia
 %type <DiaNode.dia> dia
