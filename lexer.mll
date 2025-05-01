@@ -23,10 +23,10 @@ rule parse_code = parse
       next_function = None;
     }
   }
-| '-'? ['0'-'9']+ as hex {
-    dia_dbgprint ("DIA_INTEGER: " ^ hex);
+| ['1'-'9']['0'-'9']* | '0' as int {
+    dia_dbgprint ("DIA_INTEGER: " ^ int);
     DIA_INTEGER {
-      name = hex;
+      name = int;
       token_type = DiaConstant DiaInteger;
       num_of_parameters = 0;
       parameters = [];

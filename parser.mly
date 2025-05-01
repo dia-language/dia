@@ -326,10 +326,19 @@ dia_arithmetic:
   }
 | dia_function DIA_MOD dia_function {
     {
-      name = "modular";
+      name = "modulus";
       token_type = DiaFunction DiaVoid;
       num_of_parameters = 2;
       parameters = [ $1; $3 ];
+      next_function = None;
+    }
+  }
+| DIA_MINUS dia_function {
+    {
+      name = "negate";
+      token_type = DiaFunction DiaVoid;
+      num_of_parameters = 1;
+      parameters = [ $2; ];
       next_function = None;
     }
   }
