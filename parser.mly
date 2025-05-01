@@ -236,6 +236,31 @@ dia_expr:
     }
   }
 | dia_function { $1 }
+| dia_if { $1 }
+;
+
+(* if (a>b) a - b else b - a
+ * param 1: a > b
+ * param 2: a - b
+ * param 3: b - a
+ *)
+dia_if:
+| DIA_IF DIA_OPEN_PARENTHESIS dia_function DIA_CLOSE_PARENTHESIS dia_expr dia_else
+  {
+    dia_dbgprint "dia_if: If-else clause detected.";
+    {
+      name = "if";
+      token_type = DiaFunction DiaBool;
+      num_of_parameters = 3;
+      parameters = [$3; $5; $6];
+      next_function = None;
+    }
+  }
+;
+
+dia_else:
+| DIA_ELSE dia_if { $2 }
+| DIA_ELSE dia_function { $2 }
 ;
 
 dia_function:

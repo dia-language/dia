@@ -79,48 +79,50 @@ let dia_create_cpp_variable (i: int) =
   Printf.sprintf "v%d" i
 
 let rec dia_generate_code (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
-  match node.token_type with
-  | DiaConstant _ -> node, var_index
-  | DiaFunctionParam _ -> (
-      dia_dbgprint (Printf.sprintf "Function parameter '%s' detected" node.name);
-      node, var_index
-    )
-  | DiaFunction _ ->
-    dia_dbgprint (Printf.sprintf "Generating code for function '%s'"  node.name);
-    dia_debug_function_descriptor node 0;
-    (* Evaluate the parameters first. *)
-    let parameters, _var_index = dia_generate_code_parameter node.parameters custom_functions var_index in
-    (* Find the node name in custom created function list *)
-    let cfunc = List.find_opt
-      (fun (e: DiaNode.dia_node) -> e.name = node.name)
-      custom_functions
-    in
-    match cfunc with
-    | Some func -> List.map (fun (p: DiaNode.dia_node) -> p.name) parameters
-      |> String.concat ","
-      |> Printf.printf "auto %s = %s(%s);\n" (dia_create_cpp_variable _var_index) node.name;
-      {
-        name = dia_create_cpp_variable _var_index;
-        token_type = func.token_type;
-        num_of_parameters = 0;
-        parameters = [];
-        next_function = None;
-      }, (_var_index + 1)
-    | None ->
-      (* Find given function name in predefined function list *)
-      let pfunc = List.find_opt 
-        (fun (e: Predefined.dia_predefined_function) -> e.node.name = node.name)
-        Predefined.functions
+  if node.name = "if"
+  then dia_if node custom_functions var_index
+  else match node.token_type with
+    | DiaConstant _ -> node, var_index
+    | DiaFunctionParam _ -> (
+        dia_dbgprint (Printf.sprintf "Function parameter '%s' detected" node.name);
+        node, var_index
+      )
+    | DiaFunction _ ->
+      dia_dbgprint (Printf.sprintf "Generating code for function '%s'"  node.name);
+      dia_debug_function_descriptor node 0;
+      (* Evaluate the parameters first. *)
+      let parameters, _var_index = dia_generate_code_parameter node.parameters custom_functions var_index in
+      (* Find the node name in custom created function list *)
+      let cfunc = List.find_opt
+        (fun (e: DiaNode.dia_node) -> e.name = node.name)
+        custom_functions
       in
-      match pfunc with
-      | None -> raise (DiaSyntaxError ("Error: Unknown identifier " ^ node.name))
-      | Some func -> func.generate_code {
-          name = node.name;
-          token_type = node.token_type;
-          num_of_parameters = node.num_of_parameters;
-          parameters = parameters;
-          next_function = node.next_function;
-        } _var_index
+      match cfunc with
+      | Some func -> List.map (fun (p: DiaNode.dia_node) -> p.name) parameters
+        |> String.concat ","
+        |> Printf.printf "auto %s = %s(%s);\n" (dia_create_cpp_variable _var_index) node.name;
+        {
+          name = dia_create_cpp_variable _var_index;
+          token_type = func.token_type;
+          num_of_parameters = 0;
+          parameters = [];
+          next_function = None;
+        }, (_var_index + 1)
+      | None ->
+        (* Find given function name in predefined function list *)
+        let pfunc = List.find_opt
+          (fun (e: Predefined.dia_predefined_function) -> e.node.name = node.name)
+          Predefined.functions
+        in
+        match pfunc with
+        | None -> raise (DiaSyntaxError ("Error: Unknown identifier '" ^ node.name ^ "'. Don't know how to generate it."))
+        | Some func -> func.generate_code {
+            name = node.name;
+            token_type = node.token_type;
+            num_of_parameters = node.num_of_parameters;
+            parameters = parameters;
+            next_function = node.next_function;
+          } _var_index
 
 and dia_generate_code_parameter (nodes: DiaNode.dia_node list) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node list * int =
   match nodes with
@@ -129,7 +131,43 @@ and dia_generate_code_parameter (nodes: DiaNode.dia_node list) (custom_functions
     let p, vi = dia_generate_code n custom_functions var_index in
     let ps, i = dia_generate_code_parameter ns custom_functions vi in
     (p :: ps, i)
-    
+
+and dia_if (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
+  dia_dbgprint "Generating code of if-else clause";
+  let _, _ = dia_if_parse_condition node custom_functions var_index in
+  dia_if_parse_bodies node custom_functions var_index
+
+and dia_if_parse_condition (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
+  let _, _var_index = dia_generate_code (List.nth node.parameters 0) custom_functions var_index in
+  let else_clause = List.nth node.parameters 2 in
+  match else_clause.name with
+  (* else if (<Condition>) <Dia expression> *)
+  | "if" -> dia_if_parse_condition else_clause custom_functions _var_index
+  (* else <Dia expression> *)
+  | _ -> node, var_index
+
+and dia_if_parse_bodies (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
+  let _ = Printf.printf "if(%s){\n" (dia_create_cpp_variable var_index) in
+  let _ =
+    let _node = List.nth node.parameters 1 in
+    match _node.token_type with
+    | DiaConstant _ -> Printf.printf "return %s;\n} else " _node.name
+    | _ -> let parameters, _var_index = dia_generate_code _node custom_functions var_index in
+           Printf.printf "return %s;\n} else " (dia_create_cpp_variable _var_index)
+  in
+  let _node = List.nth node.parameters 2 in
+  if _node.name = "if"
+  then dia_if_parse_bodies _node custom_functions (var_index + 1)
+  else
+    begin
+      let _node = List.nth node.parameters 2 in
+      match _node.token_type with
+      | DiaConstant _ -> Printf.printf "{\nreturn %s;\n}\n" _node.name; node, (var_index + 1)
+      | _ -> let _ = print_endline "{" in
+             let parameters, _var_index = dia_generate_code _node custom_functions var_index in
+             Printf.printf "return %s;\n}\n" (dia_create_cpp_variable _var_index);
+             node, (_var_index + 1)
+    end
 
 let rec dia_generate_code_chain (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
   let n, i = dia_generate_code node custom_functions var_index in
