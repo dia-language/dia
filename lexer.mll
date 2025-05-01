@@ -88,7 +88,7 @@ rule parse_code = parse
 | ('T'|'t') "rue" as tr {
     dia_dbgprint ("DIA_BOOL: " ^ tr);
     DIA_BOOL {
-      name = tr;
+      name = "true";
       token_type = DiaConstant DiaBool;
       num_of_parameters = 0;
       parameters = [];
@@ -98,7 +98,7 @@ rule parse_code = parse
 | ('F'|'f') "alse" as fl {
     dia_dbgprint ("DIA_BOOL: " ^ fl);
     DIA_BOOL {
-      name = fl;
+      name = "false";
       token_type = DiaConstant DiaBool;
       num_of_parameters = 0;
       parameters = [];
