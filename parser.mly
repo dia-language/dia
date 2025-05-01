@@ -104,6 +104,9 @@
 
 /* Precedence */
 /* Reference: https://en.cppreference.com/w/c/language/operator_precedence */
+%left DIA_NEXT
+%left DIA_BIND
+
 %left DIA_LOGICAL_OR
 %left DIA_LOGICAL_AND
 
@@ -116,7 +119,6 @@
 
 %left DIA_PLUS DIA_MINUS
 %left DIA_MUL DIA_DIV DIA_MOD
-%left DIA_BIND DIA_NEXT
 
 %start dia
 %type <DiaNode.dia> dia
