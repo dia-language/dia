@@ -85,7 +85,9 @@ let dia_create_cpp_variable (i: int) =
 
 let rec dia_generate_code (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
   if node.name = "if"
-  then dia_if node custom_functions var_index
+  then
+    let node, custom_functions, _ = dia_if node custom_functions var_index 0 in
+    node, custom_functions
   else match node.token_type with
     | DiaConstant _ -> node, var_index
     | DiaFunctionParam _ -> (
@@ -137,42 +139,46 @@ and dia_generate_code_parameter (nodes: DiaNode.dia_node list) (custom_functions
     let ps, i = dia_generate_code_parameter ns custom_functions vi in
     (p :: ps, i)
 
-and dia_if (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
+and dia_if (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int) (if_depth: int): DiaNode.dia_node * int * int =
   dia_dbgprint "Generating code of if-else clause";
-  let _, _ = dia_if_parse_condition node custom_functions var_index in
-  dia_if_parse_bodies node custom_functions var_index
+  let _, _, _if_depth = dia_if_parse_condition node custom_functions var_index if_depth in
+  dia_if_parse_bodies node custom_functions var_index (_if_depth + 1)
 
-and dia_if_parse_condition (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
+and dia_if_parse_condition (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int) (if_depth: int): DiaNode.dia_node * int * int =
   let _, _var_index = dia_generate_code (List.nth node.parameters 0) custom_functions var_index in
   let else_clause = List.nth node.parameters 2 in
   match else_clause.name with
   (* else if (<Condition>) <Dia expression> *)
-  | "if" -> dia_if_parse_condition else_clause custom_functions _var_index
+  | "if" -> dia_if_parse_condition else_clause custom_functions _var_index (if_depth + 1)
   (* else <Dia expression> *)
-  | _ -> node, var_index
+  | _ -> dia_dbgprint (Printf.sprintf "if_parse_condition: depth is %d" if_depth); node, var_index, if_depth
 
-and dia_if_parse_bodies (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
+and dia_if_parse_bodies (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int) (if_depth: int): DiaNode.dia_node * int * int =
+  (* if { <body> }*)
   let _ = Printf.printf "if(%s){\n" (dia_create_cpp_variable var_index) in
-  let _ =
+  let body_var_index = (* The body_var_index would hold an incremented value from the latest used variable index. *)
     let _node = List.nth node.parameters 1 in
     match _node.token_type with
-    | DiaConstant _ -> Printf.printf "return %s;\n} else " _node.name
-    | _ -> let parameters, _var_index = dia_generate_code _node custom_functions var_index in
-           Printf.printf "return %s;\n} else " (dia_create_cpp_variable _var_index)
+    | DiaConstant _ -> Printf.printf "return %s;\n} else " _node.name; (var_index + 1)
+    | _ -> let parameters, body_var_index = dia_generate_code _node custom_functions (var_index + if_depth) in
+           Printf.printf "return %s;\n} else " (dia_create_cpp_variable body_var_index); (body_var_index + 1)
   in
+  (* else *)
   let _node = List.nth node.parameters 2 in
-  if _node.name = "if"
-  then dia_if_parse_bodies _node custom_functions (var_index + 1)
-  else
-    begin
+    dia_dbgprint (Printf.sprintf "if_parse_condition: depth is %d" body_var_index);
+    (* else if *)
+    if _node.name = "if"
+    then dia_if_parse_bodies _node custom_functions (var_index + 1) if_depth
+    (* else { <body> }*)
+    else
       let _node = List.nth node.parameters 2 in
       match _node.token_type with
-      | DiaConstant _ -> Printf.printf "{\nreturn %s;\n}\n" _node.name; node, (var_index + 1)
+      | DiaConstant _ -> Printf.printf "{\nreturn %s;\n}\n" _node.name; node, (body_var_index + 1), if_depth
       | _ -> let _ = print_endline "{" in
-             let parameters, _var_index = dia_generate_code _node custom_functions var_index in
-             Printf.printf "return %s;\n}\n" (dia_create_cpp_variable _var_index);
-             node, (_var_index + 1)
-    end
+             let parameters, body_var_index = dia_generate_code _node custom_functions body_var_index in
+             Printf.printf "return %s;\n}\n" (dia_create_cpp_variable (body_var_index - 1));
+             node, (body_var_index + 1), if_depth
+
 
 let rec dia_generate_code_chain (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_node list) (var_index: int): DiaNode.dia_node * int =
   let n, i = dia_generate_code node custom_functions var_index in
