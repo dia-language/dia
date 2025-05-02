@@ -160,7 +160,7 @@ and dia_if_parse_bodies (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_
     let _node = List.nth node.parameters 1 in
     match _node.token_type with
     | DiaConstant _ -> Printf.printf "return %s;\n} else " _node.name; (var_index + 1)
-    | _ -> let parameters, body_var_index = dia_generate_code _node custom_functions (var_index + if_depth) in
+    | _ -> let _, body_var_index = dia_generate_code _node custom_functions (var_index + if_depth) in
            Printf.printf "return %s;\n} else " (dia_create_cpp_variable body_var_index); (body_var_index + 1)
   in
   (* else *)
@@ -175,7 +175,7 @@ and dia_if_parse_bodies (node: DiaNode.dia_node) (custom_functions: DiaNode.dia_
       match _node.token_type with
       | DiaConstant _ -> Printf.printf "{\nreturn %s;\n}\n" _node.name; node, (body_var_index + 1), if_depth
       | _ -> let _ = print_endline "{" in
-             let parameters, body_var_index = dia_generate_code _node custom_functions body_var_index in
+             let _, body_var_index = dia_generate_code _node custom_functions body_var_index in
              Printf.printf "return %s;\n}\n" (dia_create_cpp_variable (body_var_index - 1));
              node, (body_var_index + 1), if_depth
 
