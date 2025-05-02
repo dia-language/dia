@@ -1,6 +1,8 @@
 open Dia
 open DiaNode
 
+exception DiaFileNotFoundError of string
+
 let dia_help = "\
   Dia: The brilliance of Diamond, the elegance of the Language\n\n\
   Usage: diac [options] file.dia\n\n\
@@ -69,13 +71,15 @@ let speclist = [
 let _ =
   let () = Arg.parse speclist (fun str -> cli_options.input_file := str) dia_help in
   let ch = if cli_options.input_file.contents = ""
-    then stdin
+    then raise (DiaFileNotFoundError "Dia: No input file given. Example: diac <file>.dia")
     else open_in cli_options.input_file.contents
   in
-  let lexbuf = Lexing.from_channel ch in
+  let dia_file = In_channel.input_all ch in
+  let _ = In_channel.close ch in
+  let lexbuf = Lexing.from_string dia_file in
   while true do 
     let result = Parser.dia Lexer.parse_code lexbuf in
       print_endline generate_header;
-      List.iter (fun f -> dia_custom_function f result.custom_functions "original_code") result.custom_functions;
-      dia_main result "original_code"
+      List.iter (fun f -> dia_custom_function f result.custom_functions) result.custom_functions;
+      dia_main result dia_file
   done

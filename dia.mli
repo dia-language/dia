@@ -6,4 +6,4 @@ val dia_generate_code : DiaNode.dia_node -> DiaNode.dia_node list -> int -> DiaN
 
 val dia_main : DiaNode.dia -> string -> unit
 
-val dia_custom_function : DiaNode.dia_node -> DiaNode.dia_node list -> string -> unit
+val dia_custom_function : DiaNode.dia_node -> DiaNode.dia_node list -> unit
