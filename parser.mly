@@ -104,7 +104,6 @@
 
 /* Precedence */
 /* Reference: https://en.cppreference.com/w/c/language/operator_precedence */
-%left DIA_NEXT
 %left DIA_BIND
 
 %left DIA_LOGICAL_OR
