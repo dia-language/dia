@@ -81,3 +81,4 @@ let _ =
   print_endline generate_header;
   List.iter (fun f -> dia_custom_function f result.custom_functions) result.custom_functions;
   dia_main result dia_file
+
