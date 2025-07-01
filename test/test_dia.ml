@@ -10,3 +10,4 @@ let () =
     ("dia_create_cpp_variable",
      [test_case "creates variables" `Quick test_create_cpp_variable]);
   ]
+
