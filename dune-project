@@ -19,7 +19,8 @@
  (name dia)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml)
+ (depends
+   (ocaml (>= 5.3)))
  (allow_empty)
  (tags
   ("add topics" "to describe" your project)))

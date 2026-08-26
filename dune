@@ -1,5 +1,11 @@
 (ocamllex lexer)
 (ocamlyacc parser)
 
+(library
+ (name dia)
+ (modules dia diaNode predefined))
+
 (executable
-  (name main))
+ (name main)
+ (modules main lexer parser)
+ (libraries dia))
