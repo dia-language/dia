@@ -1,0 +1,5 @@
+jus(a: int, b:int): int = if (a>b) a-b else b-a
+
+main = jus(3,5).puts;  #=> 2
+       6.jus(10).puts; #=> 4
+       puts(jus(3,10)) #=> 7

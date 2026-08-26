@@ -7,9 +7,9 @@
 (source
  (github dia-language/dia))
 
-(authors "Ch1keen <contact@ch1keen.xyz>")
+(authors "Ch1keen <contact@ch1keen.beer>")
 
-(maintainers "Ch1keen <contact@ch1keen.xyz>")
+(maintainers "Ch1keen <contact@ch1keen.beer>")
 
 (license GPLv3)
 
